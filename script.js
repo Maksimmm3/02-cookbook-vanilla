@@ -89,4 +89,35 @@ const recipes = [
   },
 ];
 
-console.log(recipes);
+const recipesContainer = document.querySelector('.recipes');
+
+function createRecipeCard(recipe) {
+  return `
+        <article class="recipe-card">
+          <img
+            src="${recipe.image}"
+            alt="${recipe.title}"
+            loading="lazy"
+          />
+          <div class="recipe-card__content">
+            <h3 class="recipe-card__title"><a href="#">${recipe.title}</a></h3>
+            <p class="recipe-card__description">${recipe.description}</p>
+            <div class="recipe-card__meta">
+              <span
+                class="recipe-card__category recipe-card__category--${recipe.category}"
+                >${recipe.category}</span
+              >
+              <span class="recipe-card__time">15 min</span>
+            </div>
+          </div>
+        </article>
+
+  `;
+}
+
+function renderRecipes(recipes) {
+  const cardsHTML = recipes.map(createRecipeCard).join('');
+  recipesContainer.innerHTML = cardsHTML;
+}
+
+renderRecipes(recipes);
