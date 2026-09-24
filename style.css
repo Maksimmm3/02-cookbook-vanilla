@@ -110,3 +110,55 @@ body {
   color: #666;
   margin-bottom: 12px;
 }
+
+.modal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: none;
+  padding: 0;
+  border-radius: var(--radius);
+  max-height: 90vh;
+  width: 100%;
+  max-width: min(500px, 90vw);
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.modal__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.modal__close:hover {
+  background: #fff;
+}
+
+.modal__image {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.modal__content {
+  padding: 24px;
+  overflow-y: auto;
+}
