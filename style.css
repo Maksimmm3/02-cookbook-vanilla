@@ -112,15 +112,15 @@ body {
 }
 
 .modal {
-  position: relative;
-  display: flex;
-  flex-direction: column;
+  position: fixed;
+  inset: 0;
+  margin: auto;
   border: none;
   padding: 0;
   border-radius: var(--radius);
   max-height: 90vh;
-  width: 100%;
-  max-width: min(500px, 90vw);
+  width: min(500px, 90vw);
+  height: fit-content;
   overflow: hidden;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
