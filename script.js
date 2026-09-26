@@ -90,10 +90,19 @@ const recipes = [
 ];
 
 const recipesContainer = document.querySelector('.recipes');
+const modal = document.querySelector('.modal');
+const modalClose = document.querySelector('.modal__close');
+const modalImage = document.querySelector('.modal__image');
+const modalTitle = document.querySelector('.modal__title');
+const modalCategory = document.querySelector('.modal__category');
+const modalTime = document.querySelector('.modal__time');
+const modalDescription = document.querySelector('.modal__description');
+const modalIngredients = document.querySelector('.modal__ingredients-list');
+const modalInstructions = document.querySelector('.modal__instructions-text');
 
 function createRecipeCard(recipe) {
   return `
-        <article class="recipe-card">
+        <article class="recipe-card" data-id="${recipe.id}">
           <img
             src="${recipe.image}"
             alt="${recipe.title}"
@@ -120,4 +129,36 @@ function renderRecipes(recipes) {
   recipesContainer.innerHTML = cardsHTML;
 }
 
+function openModal(recipe) {
+  modalImage.src = recipe.image;
+  modalImage.alt = recipe.title;
+  modalTitle.textContent = recipe.title;
+  modalCategory.className = `modal__category modal__category--${recipe.category}`;
+  modalCategory.textContent = recipe.category;
+  modalTime.textContent = '15 min';
+  modalDescription.textContent = recipe.description;
+
+  modalIngredients.innerHTML = recipe.ingredients
+    .map((ingredient) => `<li>${ingredient}</li>`)
+    .join('');
+
+  modalInstructions.textContent = recipe.instructions;
+
+  modal.showModal();
+}
+
+function handleCardClick(event) {
+  const card = event.target.closest('.recipe-card');
+
+  if (!card) return;
+
+  const id = Number(card.dataset.id);
+  const recipe = recipes.find((r) => r.id === id);
+
+  if (recipe) {
+    openModal(recipe);
+  }
+}
+
 renderRecipes(recipes);
+recipesContainer.addEventListener('click', handleCardClick);

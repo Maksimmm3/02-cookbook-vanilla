@@ -162,3 +162,26 @@ body {
   padding: 24px;
   overflow-y: auto;
 }
+
+.modal__category {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.modal__category--breakfast {
+  background-color: rgb(202, 183, 183);
+}
+.modal__category--lunch {
+  background-color: rgb(172, 235, 178);
+}
+.modal__category--dinner {
+  background-color: rgb(184, 215, 233);
+}
+.modal__category--dessert {
+  background-color: rgb(235, 170, 208);
+}
