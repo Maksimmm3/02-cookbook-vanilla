@@ -162,3 +162,11 @@ function handleCardClick(event) {
 
 renderRecipes(recipes);
 recipesContainer.addEventListener('click', handleCardClick);
+modalClose.addEventListener('click', () => {
+  modal.close();
+});
+modal.addEventListener('click', (event) => {
+  if (event.target === modal) {
+    modal.close();
+  }
+});
