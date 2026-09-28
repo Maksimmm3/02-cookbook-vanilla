@@ -144,6 +144,11 @@ function openModal(recipe) {
 
   modalInstructions.textContent = recipe.instructions;
 
+  const scrollY = window.scrollY;
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${scrollY}px`;
+  document.body.style.width = '100%';
+
   modal.showModal();
 }
 
@@ -160,13 +165,25 @@ function handleCardClick(event) {
   }
 }
 
+function closeModal() {
+  modal.close();
+}
+
+modal.addEventListener('close', () => {
+  const scrollY = document.body.style.top;
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.width = '';
+  window.scrollTo(0, parseInt(scrollY || '0') * -1);
+});
+
 renderRecipes(recipes);
 recipesContainer.addEventListener('click', handleCardClick);
 modalClose.addEventListener('click', () => {
-  modal.close();
+  closeModal();
 });
 modal.addEventListener('click', (event) => {
   if (event.target === modal) {
-    modal.close();
+    closeModal();
   }
 });
