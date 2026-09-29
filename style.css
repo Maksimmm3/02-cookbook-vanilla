@@ -185,3 +185,34 @@ body {
 .modal__category--dessert {
   background-color: rgb(235, 170, 208);
 }
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 0 20px;
+}
+
+.filters__btn {
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  background-color: transparent;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.filters__btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.filters__btn--active {
+  background-color: var(--color-text);
+  color: var(--color-card);
+  border-color: var(--color-text);
+}

@@ -89,6 +89,7 @@ const recipes = [
   },
 ];
 
+const filtersContainer = document.querySelector('.filters');
 const recipesContainer = document.querySelector('.recipes');
 const modal = document.querySelector('.modal');
 const modalClose = document.querySelector('.modal__close');
@@ -171,6 +172,30 @@ function handleCardClick(event) {
 function closeModal() {
   modal.close();
 }
+
+function handleFilterClick(event) {
+  const btn = event.target.closest('.filters__btn');
+  if (!btn) return;
+
+  const category = btn.dataset.category;
+
+  document.querySelectorAll('.filters__btn').forEach((b) => {
+    b.classList.remove('filters__btn--active');
+    b.setAttribute('aria-pressed', 'false');
+  });
+
+  btn.classList.add('filters__btn--active');
+  btn.setAttribute('aria-pressed', 'true');
+
+  const filtered =
+    category === 'all'
+      ? recipes
+      : recipes.filter((r) => r.category === category);
+
+  renderRecipes(filtered);
+}
+
+filtersContainer.addEventListener('click', handleFilterClick);
 
 modal.addEventListener('close', () => {
   const scrollY = document.body.style.top;
