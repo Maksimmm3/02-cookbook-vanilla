@@ -130,6 +130,9 @@ function renderRecipes(recipes) {
 }
 
 function openModal(recipe) {
+  modalImage.onerror = () => {
+    modalImage.src = 'https://placehold.co/500x300?text=No+Image';
+  };
   modalImage.src = recipe.image;
   modalImage.alt = recipe.title;
   modalTitle.textContent = recipe.title;
