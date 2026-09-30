@@ -216,3 +216,11 @@ body {
   color: var(--color-card);
   border-color: var(--color-text);
 }
+
+.recipes-count {
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  padding: 0 20px;
+}

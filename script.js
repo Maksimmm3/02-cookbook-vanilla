@@ -90,6 +90,7 @@ const recipes = [
 ];
 
 const filtersContainer = document.querySelector('.filters');
+const recipesCount = document.querySelector('.recipes-count');
 const recipesContainer = document.querySelector('.recipes');
 const modal = document.querySelector('.modal');
 const modalClose = document.querySelector('.modal__close');
@@ -128,6 +129,10 @@ function createRecipeCard(recipe) {
 function renderRecipes(recipes) {
   const cardsHTML = recipes.map(createRecipeCard).join('');
   recipesContainer.innerHTML = cardsHTML;
+
+  const count = recipes.length;
+  const word = count === 1 ? 'recipe' : 'recipes';
+  recipesCount.textContent = `${count} ${word}`;
 }
 
 function openModal(recipe) {
