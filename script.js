@@ -111,7 +111,9 @@ function createRecipeCard(recipe) {
             loading="lazy"
           />
           <div class="recipe-card__content">
-            <h3 class="recipe-card__title"><a href="#">${recipe.title}</a></h3>
+            <h3 class="recipe-card__title">
+              <button class="recipe-card__btn" type="button">${recipe.title}</button>
+            </h3>
             <p class="recipe-card__description">${recipe.description}</p>
             <div class="recipe-card__meta">
               <span
