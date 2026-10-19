@@ -177,7 +177,12 @@ function handleCardClick(event) {
 }
 
 function closeModal() {
-  modal.close();
+  modal.classList.add('modal--closing');
+
+  setTimeout(() => {
+    modal.close();
+    modal.classList.remove('modal--closing');
+  }, 300);
 }
 
 function handleFilterClick(event) {
@@ -210,6 +215,11 @@ modal.addEventListener('close', () => {
   document.body.style.top = '';
   document.body.style.width = '';
   window.scrollTo(0, parseInt(scrollY || '0') * -1);
+});
+
+modal.addEventListener('cancel', (event) => {
+  event.preventDefault();
+  closeModal();
 });
 
 renderRecipes(recipes);

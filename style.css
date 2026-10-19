@@ -224,6 +224,10 @@ body {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
+.modal:not([open]) {
+  display: none;
+}
+
 @keyframes modal-fade-in {
   from {
     opacity: 0;
@@ -252,12 +256,16 @@ body {
   animation: backdrop-fade-in 0.3s ease;
 }
 
-.modal:not([open]) {
-  display: none;
-}
-
 .modal::backdrop {
   background: rgba(0, 0, 0, 0.5);
+}
+
+.modal--closing {
+  opacity: 0;
+  transform: scale(0.9);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
 }
 
 .modal__close {
