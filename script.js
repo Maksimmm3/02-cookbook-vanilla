@@ -209,6 +209,20 @@ function handleFilterClick(event) {
 
 filtersContainer.addEventListener('click', handleFilterClick);
 
+recipesContainer.addEventListener(
+  'error',
+  (event) => {
+    const img = event.target;
+
+    if (img.tagName !== 'IMG') return;
+    if (img.dataset.fallback) return;
+
+    img.dataset.fallback = 'true';
+    img.src = 'https://placehold.co/300x200?text=No+Image';
+  },
+  true,
+);
+
 modal.addEventListener('close', () => {
   const scrollY = document.body.style.top;
   document.body.style.position = '';
