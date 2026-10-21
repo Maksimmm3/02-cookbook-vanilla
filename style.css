@@ -95,6 +95,13 @@ body {
   padding: 0 20px;
 }
 
+.recipes-empty {
+  text-align: center;
+  color: #666;
+  font-size: 1rem;
+  padding: 40px 20px;
+}
+
 /* ---------- Recipes grid ---------- */
 
 .recipes {

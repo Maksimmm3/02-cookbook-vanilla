@@ -91,6 +91,7 @@ const recipes = [
 
 const filtersContainer = document.querySelector('.filters');
 const recipesCount = document.querySelector('.recipes-count');
+const recipesEmpty = document.querySelector('.recipes-empty');
 const recipesContainer = document.querySelector('.recipes');
 const modal = document.querySelector('.modal');
 const modalClose = document.querySelector('.modal__close');
@@ -135,6 +136,8 @@ function renderRecipes(recipes) {
   const count = recipes.length;
   const word = count === 1 ? 'recipe' : 'recipes';
   recipesCount.textContent = `${count} ${word}`;
+
+  recipesEmpty.hidden = count > 0;
 }
 
 function openModal(recipe) {
