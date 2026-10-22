@@ -194,6 +194,12 @@ function handleFilterClick(event) {
 
   const category = btn.dataset.category;
 
+  try {
+    localStorage.setItem('recipeFilter', category);
+  } catch (e) {
+    // localStorage unavailable (private mode) — ignore
+  }
+
   document.querySelectorAll('.filters__btn').forEach((b) => {
     b.classList.remove('filters__btn--active');
     b.setAttribute('aria-pressed', 'false');
@@ -207,6 +213,34 @@ function handleFilterClick(event) {
       ? recipes
       : recipes.filter((r) => r.category === category);
 
+  renderRecipes(filtered);
+}
+
+function initFilters() {
+  let saved = 'all';
+
+  try {
+    saved = localStorage.getItem('recipeFilter') || 'all';
+  } catch (e) {
+    // localStorage unavailable — fallback to 'all'
+  }
+
+  const btn = document.querySelector(`.filters__btn[data-category="${saved}"]`);
+
+  if (!btn) {
+    renderRecipes(recipes);
+    return;
+  }
+
+  document.querySelectorAll('.filters__btn').forEach((b) => {
+    b.classList.remove('filters__btn--active');
+    b.setAttribute('aria-pressed', 'false');
+  });
+  btn.classList.add('filters__btn--active');
+  btn.setAttribute('aria-pressed', 'true');
+
+  const filtered =
+    saved === 'all' ? recipes : recipes.filter((r) => r.category === saved);
   renderRecipes(filtered);
 }
 
@@ -239,7 +273,7 @@ modal.addEventListener('cancel', (event) => {
   closeModal();
 });
 
-renderRecipes(recipes);
+initFilters();
 recipesContainer.addEventListener('click', handleCardClick);
 modalClose.addEventListener('click', () => {
   closeModal();
