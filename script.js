@@ -1,93 +1,4 @@
-const recipes = [
-  {
-    id: 1,
-    title: 'Classic Pancakes',
-    category: 'breakfast',
-    image: 'https://placehold.co/300x200',
-    description: 'Fluffy pancakes served with maple syrup',
-    ingredients: ['Flour', 'Milk', 'Eggs', 'Sugar', 'Baking powder'],
-    instructions:
-      'Mix dry ingredients. Add wet ingredients. Cook on a non-stick pan until golden.',
-  },
-  {
-    id: 2,
-    title: 'Avocado Toast',
-    category: 'breakfast',
-    image: 'https://placehold.co/300x200',
-    description: 'Crispy toast topped with fresh avocado and a poached egg',
-    ingredients: ['Bread', 'Avocado', 'Egg', 'Salt', 'Pepper', 'Lemon juice'],
-    instructions:
-      'Toast the bread. Mash avocado with lemon, salt and pepper. Spread on toast. Top with a poached egg.',
-  },
-  {
-    id: 3,
-    title: 'Caesar Salad',
-    category: 'lunch',
-    image: 'https://placehold.co/300x200',
-    description: 'Classic Caesar salad with crunchy croutons and parmesan',
-    ingredients: [
-      'Romaine lettuce',
-      'Croutons',
-      'Parmesan',
-      'Caesar dressing',
-      'Lemon',
-    ],
-    instructions:
-      'Chop lettuce. Add croutons and parmesan. Drizzle with dressing and toss well.',
-  },
-  {
-    id: 4,
-    title: 'Grilled Chicken Wrap',
-    category: 'lunch',
-    image: 'https://placehold.co/300x200',
-    description:
-      'Juicy grilled chicken with fresh veggies wrapped in a soft tortilla',
-    ingredients: [
-      'Chicken breast',
-      'Tortilla',
-      'Lettuce',
-      'Tomato',
-      'Sour cream',
-      'Cheese',
-    ],
-    instructions:
-      'Grill chicken and slice. Layer all ingredients on tortilla. Roll tightly and serve.',
-  },
-  {
-    id: 5,
-    title: 'Spaghetti Bolognese',
-    category: 'dinner',
-    image: 'https://placehold.co/300x200',
-    description: 'Rich and hearty Italian pasta with a slow-cooked meat sauce',
-    ingredients: [
-      'Spaghetti',
-      'Ground beef',
-      'Tomato sauce',
-      'Onion',
-      'Garlic',
-      'Olive oil',
-    ],
-    instructions:
-      'Saute onion and garlic. Add beef and cook. Pour in tomato sauce and simmer 20 minutes. Serve over spaghetti.',
-  },
-  {
-    id: 6,
-    title: 'Chocolate Brownies',
-    category: 'dessert',
-    image: 'https://placehold.co/300x200',
-    description: 'Fudgy chocolate brownies with a crispy top',
-    ingredients: [
-      'Butter',
-      'Sugar',
-      'Eggs',
-      'Cocoa powder',
-      'Flour',
-      'Vanilla extract',
-    ],
-    instructions:
-      'Melt butter. Mix in sugar, eggs and vanilla. Fold in cocoa and flour. Bake at 180°C for 25 minutes.',
-  },
-];
+let allRecipes = [];
 
 const filtersContainer = document.querySelector('.filters');
 const recipesCount = document.querySelector('.recipes-count');
@@ -168,11 +79,10 @@ function openModal(recipe) {
 
 function handleCardClick(event) {
   const card = event.target.closest('.recipe-card');
-
   if (!card) return;
 
   const id = Number(card.dataset.id);
-  const recipe = recipes.find((r) => r.id === id);
+  const recipe = allRecipes.find((r) => r.id === id);
 
   if (recipe) {
     openModal(recipe);
@@ -210,13 +120,13 @@ function handleFilterClick(event) {
 
   const filtered =
     category === 'all'
-      ? recipes
-      : recipes.filter((r) => r.category === category);
+      ? allRecipes
+      : allRecipes.filter((r) => r.category === category);
 
   renderRecipes(filtered);
 }
 
-function initFilters() {
+function initFilters(recipes) {
   let saved = 'all';
 
   try {
@@ -273,7 +183,36 @@ modal.addEventListener('cancel', (event) => {
   closeModal();
 });
 
-initFilters();
+async function loadRecipes() {
+  try {
+    const response = await fetch('/api/recipes');
+
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Failed to load recipes:', error);
+    return null;
+  }
+}
+
+async function init() {
+  const data = await loadRecipes();
+
+  if (!data) {
+    recipesCount.textContent = 'Failed to load recipes';
+    return;
+  }
+
+  allRecipes = data;
+  initFilters(allRecipes);
+}
+
+init();
+
 recipesContainer.addEventListener('click', handleCardClick);
 modalClose.addEventListener('click', () => {
   closeModal();
