@@ -31,6 +31,33 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.url === '/api/recipes' && req.method === 'POST') {
+    let body = '';
+
+    req.on('data', (chunk) => {
+      body += chunk;
+    });
+
+    req.on('end', () => {
+      try {
+        const newRecipe = JSON.parse(body);
+
+        res.writeHead(201, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            message: 'Recipe received',
+            recipe: newRecipe,
+          }),
+        );
+      } catch (error) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Invalid JSON' }));
+      }
+    });
+
+    return;
+  }
+
   let urlPath = req.url === '/' ? '/index.html' : req.url;
   urlPath = urlPath.split('?')[0];
   const filePath = path.join(__dirname, urlPath);
