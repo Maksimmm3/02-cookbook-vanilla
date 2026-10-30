@@ -41,14 +41,33 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       try {
         const newRecipe = JSON.parse(body);
+        const recipesPath = path.join(__dirname, 'recipes.json');
 
-        res.writeHead(201, { 'Content-Type': 'application/json' });
-        res.end(
-          JSON.stringify({
-            message: 'Recipe received',
-            recipe: newRecipe,
-          }),
-        );
+        fs.readFile(recipesPath, 'utf-8', (err, data) => {
+          if (err) {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Failed to read recipes' }));
+            return;
+          }
+
+          const recipes = JSON.parse(data);
+          const newId =
+            recipes.length > 0 ? Math.max(...recipes.map((r) => r.id)) + 1 : 1;
+
+          const recipeToSave = { id: newId, ...newRecipe };
+          recipes.push(recipeToSave);
+
+          fs.writeFile(recipesPath, JSON.stringify(recipes, null, 2), (err) => {
+            if (err) {
+              res.writeHead(500, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ error: 'Failed to save recipe' }));
+              return;
+            }
+
+            res.writeHead(201, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(recipeToSave));
+          });
+        });
       } catch (error) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Invalid JSON' }));
