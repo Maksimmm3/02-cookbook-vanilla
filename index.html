@@ -13,6 +13,7 @@
     </header>
 
     <main class="main">
+      <button class="add-btn" type="button">+ Add Recipe</button>
       <div class="filters" role="group" aria-label="Filter recipes by category">
         <button
           class="filters__btn filters__btn--active"
@@ -76,6 +77,67 @@
           <p class="modal__instructions-text">...</p>
         </section>
       </div>
+    </dialog>
+
+    <dialog class="form-modal">
+      <button class="form-modal__close" aria-label="Close form">&times;</button>
+
+      <form class="form" id="recipeForm">
+        <h2 class="form__title">Add New Recipe</h2>
+
+        <label class="form__label">
+          Title
+          <input class="form__input" type="text" name="title" required />
+        </label>
+
+        <label class="form__label">
+          Category
+          <select class="form__input" name="category" required>
+            <option value="">Select category</option>
+            <option value="breakfast">Breakfast</option>
+            <option value="lunch">Lunch</option>
+            <option value="dinner">Dinner</option>
+            <option value="dessert">Dessert</option>
+          </select>
+        </label>
+
+        <label class="form__label">
+          Image URL
+          <input class="form__input" type="url" name="image" required />
+        </label>
+
+        <label class="form__label">
+          Description
+          <textarea
+            class="form__input"
+            name="description"
+            rows="2"
+            required
+          ></textarea>
+        </label>
+
+        <label class="form__label">
+          Ingredients (one per line)
+          <textarea
+            class="form__input"
+            name="ingredients"
+            rows="4"
+            required
+          ></textarea>
+        </label>
+
+        <label class="form__label">
+          Instructions
+          <textarea
+            class="form__input"
+            name="instructions"
+            rows="4"
+            required
+          ></textarea>
+        </label>
+
+        <button class="form__submit" type="submit">Add Recipe</button>
+      </form>
     </dialog>
 
     <script src="script.js"></script>
