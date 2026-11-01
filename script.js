@@ -13,6 +13,10 @@ const modalTime = document.querySelector('.modal__time');
 const modalDescription = document.querySelector('.modal__description');
 const modalIngredients = document.querySelector('.modal__ingredients-list');
 const modalInstructions = document.querySelector('.modal__instructions-text');
+const addBtn = document.querySelector('.add-btn');
+const formModal = document.querySelector('.form-modal');
+const formModalClose = document.querySelector('.form-modal__close');
+const recipeForm = document.querySelector('#recipeForm');
 
 function createRecipeCard(recipe) {
   return `
@@ -77,6 +81,15 @@ function openModal(recipe) {
   modal.showModal();
 }
 
+function closeModal() {
+  modal.classList.add('modal--closing');
+
+  setTimeout(() => {
+    modal.close();
+    modal.classList.remove('modal--closing');
+  }, 300);
+}
+
 function handleCardClick(event) {
   const card = event.target.closest('.recipe-card');
   if (!card) return;
@@ -87,15 +100,6 @@ function handleCardClick(event) {
   if (recipe) {
     openModal(recipe);
   }
-}
-
-function closeModal() {
-  modal.classList.add('modal--closing');
-
-  setTimeout(() => {
-    modal.close();
-    modal.classList.remove('modal--closing');
-  }, 300);
 }
 
 function handleFilterClick(event) {
@@ -154,35 +158,6 @@ function initFilters(recipes) {
   renderRecipes(filtered);
 }
 
-filtersContainer.addEventListener('click', handleFilterClick);
-
-recipesContainer.addEventListener(
-  'error',
-  (event) => {
-    const img = event.target;
-
-    if (img.tagName !== 'IMG') return;
-    if (img.dataset.fallback) return;
-
-    img.dataset.fallback = 'true';
-    img.src = 'https://placehold.co/300x200?text=No+Image';
-  },
-  true,
-);
-
-modal.addEventListener('close', () => {
-  const scrollY = document.body.style.top;
-  document.body.style.position = '';
-  document.body.style.top = '';
-  document.body.style.width = '';
-  window.scrollTo(0, parseInt(scrollY || '0') * -1);
-});
-
-modal.addEventListener('cancel', (event) => {
-  event.preventDefault();
-  closeModal();
-});
-
 async function loadRecipes() {
   try {
     const response = await fetch('/api/recipes');
@@ -199,6 +174,42 @@ async function loadRecipes() {
   }
 }
 
+async function handleFormSubmit(event) {
+  event.preventDefault();
+
+  const formData = new FormData(recipeForm);
+  const data = Object.fromEntries(formData);
+
+  data.ingredients = data.ingredients
+    .split('\n')
+    .map((s) => s.trim())
+    .filter((s) => s);
+
+  try {
+    const response = await fetch('/api/recipes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+
+    const newRecipe = await response.json();
+
+    allRecipes.push(newRecipe);
+
+    renderRecipes(allRecipes);
+
+    formModal.close();
+    recipeForm.reset();
+  } catch (error) {
+    console.error('Failed to add recipe:', error);
+    alert('Failed to add recipe. Please try again.');
+  }
+}
+
 async function init() {
   const data = await loadRecipes();
 
@@ -211,9 +222,23 @@ async function init() {
   initFilters(allRecipes);
 }
 
-init();
+filtersContainer.addEventListener('click', handleFilterClick);
 
 recipesContainer.addEventListener('click', handleCardClick);
+recipesContainer.addEventListener(
+  'error',
+  (event) => {
+    const img = event.target;
+
+    if (img.tagName !== 'IMG') return;
+    if (img.dataset.fallback) return;
+
+    img.dataset.fallback = 'true';
+    img.src = 'https://placehold.co/300x200?text=No+Image';
+  },
+  true,
+);
+
 modalClose.addEventListener('click', () => {
   closeModal();
 });
@@ -222,3 +247,31 @@ modal.addEventListener('click', (event) => {
     closeModal();
   }
 });
+modal.addEventListener('close', () => {
+  const scrollY = document.body.style.top;
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.width = '';
+  window.scrollTo(0, parseInt(scrollY || '0') * -1);
+});
+modal.addEventListener('cancel', (event) => {
+  event.preventDefault();
+  closeModal();
+});
+
+addBtn.addEventListener('click', () => {
+  formModal.showModal();
+});
+
+formModalClose.addEventListener('click', () => {
+  formModal.close();
+});
+formModal.addEventListener('click', (event) => {
+  if (event.target === formModal) {
+    formModal.close();
+  }
+});
+
+recipeForm.addEventListener('submit', handleFormSubmit);
+
+init();
