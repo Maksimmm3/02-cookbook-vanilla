@@ -77,6 +77,48 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.url.startsWith('/api/recipes/') && req.method === 'DELETE') {
+    const id = Number(req.url.split('/').pop());
+
+    if (isNaN(id)) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Invalid id' }));
+      return;
+    }
+
+    const recipesPath = path.join(__dirname, 'recipes.json');
+
+    fs.readFile(recipesPath, 'utf-8', (err, data) => {
+      if (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Failed to read recipes' }));
+        return;
+      }
+
+      const recipes = JSON.parse(data);
+      const filtered = recipes.filter((r) => r.id !== id);
+
+      if (filtered.length === recipes.length) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Recipe not found' }));
+        return;
+      }
+
+      fs.writeFile(recipesPath, JSON.stringify(filtered, null, 2), (err) => {
+        if (err) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Failed to delete recipe' }));
+          return;
+        }
+
+        res.writeHead(204);
+        res.end();
+      });
+    });
+
+    return;
+  }
+
   let urlPath = req.url === '/' ? '/index.html' : req.url;
   urlPath = urlPath.split('?')[0];
   const filePath = path.join(__dirname, urlPath);
