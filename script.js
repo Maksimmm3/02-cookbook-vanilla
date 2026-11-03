@@ -1,4 +1,5 @@
 let allRecipes = [];
+let currentRecipeId = null;
 
 const filtersContainer = document.querySelector('.filters');
 const recipesCount = document.querySelector('.recipes-count');
@@ -17,6 +18,7 @@ const addBtn = document.querySelector('.add-btn');
 const formModal = document.querySelector('.form-modal');
 const formModalClose = document.querySelector('.form-modal__close');
 const recipeForm = document.querySelector('#recipeForm');
+const modalDelete = document.querySelector('.modal__delete');
 
 function createRecipeCard(recipe) {
   return `
@@ -56,6 +58,7 @@ function renderRecipes(recipes) {
 }
 
 function openModal(recipe) {
+  currentRecipeId = recipe.id;
   modalImage.onerror = () => {
     modalImage.src = 'https://placehold.co/500x300?text=No+Image';
   };
@@ -210,6 +213,34 @@ async function handleFormSubmit(event) {
   }
 }
 
+async function handleDelete() {
+  if (!currentRecipeId) return;
+
+  const confirmed = confirm('Are you sure you want to delete this recipe?');
+  if (!confirmed) return;
+
+  try {
+    const response = await fetch(`/api/recipes/${currentRecipeId}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+
+    allRecipes = allRecipes.filter((r) => r.id !== currentRecipeId);
+
+    closeModal();
+
+    renderRecipes(allRecipes);
+
+    currentRecipeId = null;
+  } catch (error) {
+    console.error('Failed to delete recipe:', error);
+    alert('Failed to delete recipe. Please try again.');
+  }
+}
+
 async function init() {
   const data = await loadRecipes();
 
@@ -273,5 +304,7 @@ formModal.addEventListener('click', (event) => {
 });
 
 recipeForm.addEventListener('submit', handleFormSubmit);
+
+modalDelete.addEventListener('click', handleDelete);
 
 init();

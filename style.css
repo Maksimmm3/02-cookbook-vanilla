@@ -341,6 +341,27 @@ body {
   padding-left: 20px;
 }
 
+.modal__delete {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 10px;
+  background-color: transparent;
+  color: #c0392b;
+  border: 1px solid #c0392b;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.modal__delete:hover {
+  background-color: #c0392b;
+  color: #fff;
+}
+
 @media (min-width: 600px) {
   .modal {
     width: 100%;
