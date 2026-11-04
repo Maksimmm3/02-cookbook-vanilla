@@ -119,6 +119,64 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.url.startsWith('/api/recipes/') && req.method === 'PUT') {
+    const id = Number(req.url.split('/').pop());
+
+    if (isNaN(id)) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Invalid id' }));
+      return;
+    }
+
+    let body = '';
+
+    req.on('data', (chunk) => {
+      body += chunk;
+    });
+
+    req.on('end', () => {
+      try {
+        const updatedData = JSON.parse(body);
+        const recipesPath = path.join(__dirname, 'recipes.json');
+
+        fs.readFile(recipesPath, 'utf-8', (err, data) => {
+          if (err) {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Failed to read recipes' }));
+            return;
+          }
+
+          const recipes = JSON.parse(data);
+          const index = recipes.findIndex((r) => r.id === id);
+
+          if (index === -1) {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Recipe not found' }));
+            return;
+          }
+
+          recipes[index] = { ...recipes[index], ...updatedData, id };
+
+          fs.writeFile(recipesPath, JSON.stringify(recipes, null, 2), (err) => {
+            if (err) {
+              res.writeHead(500, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ error: 'Failed to update recipe' }));
+              return;
+            }
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(recipes[index]));
+          });
+        });
+      } catch (error) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Invalid JSON' }));
+      }
+    });
+
+    return;
+  }
+
   let urlPath = req.url === '/' ? '/index.html' : req.url;
   urlPath = urlPath.split('?')[0];
   const filePath = path.join(__dirname, urlPath);
