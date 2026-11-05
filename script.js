@@ -19,6 +19,9 @@ const formModal = document.querySelector('.form-modal');
 const formModalClose = document.querySelector('.form-modal__close');
 const recipeForm = document.querySelector('#recipeForm');
 const modalDelete = document.querySelector('.modal__delete');
+const modalEdit = document.querySelector('.modal__edit');
+const formTitle = document.querySelector('.form__title');
+const formSubmit = document.querySelector('.form__submit');
 
 function createRecipeCard(recipe) {
   return `
@@ -82,6 +85,28 @@ function openModal(recipe) {
   document.body.style.width = '100%';
 
   modal.showModal();
+}
+
+function openEditForm() {
+  if (!currentRecipeId) return;
+
+  const recipe = allRecipes.find((r) => r.id === currentRecipeId);
+  if (!recipe) return;
+
+  formTitle.textContent = 'Edit Recipe';
+  formSubmit.textContent = 'Save Changes';
+
+  recipeForm.elements.title.value = recipe.title;
+  recipeForm.elements.category.value = recipe.category;
+  recipeForm.elements.image.value = recipe.image;
+  recipeForm.elements.description.value = recipe.description;
+  recipeForm.elements.ingredients.value = recipe.ingredients.join('\n');
+  recipeForm.elements.instructions.value = recipe.instructions;
+
+  closeModal();
+  setTimeout(() => {
+    formModal.showModal();
+  }, 300);
 }
 
 function closeModal() {
@@ -291,6 +316,11 @@ modal.addEventListener('cancel', (event) => {
 });
 
 addBtn.addEventListener('click', () => {
+  recipeForm.reset();
+  formTitle.textContent = 'Add New Recipe';
+  formSubmit.textContent = 'Add Recipe';
+  currentRecipeId = null;
+
   formModal.showModal();
 });
 
@@ -304,6 +334,8 @@ formModal.addEventListener('click', (event) => {
 });
 
 recipeForm.addEventListener('submit', handleFormSubmit);
+
+modalEdit.addEventListener('click', openEditForm);
 
 modalDelete.addEventListener('click', handleDelete);
 

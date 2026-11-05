@@ -341,20 +341,39 @@ body {
   padding-left: 20px;
 }
 
-.modal__delete {
-  display: block;
-  width: 100%;
+.modal__actions {
+  display: flex;
+  gap: 12px;
   margin-top: 16px;
+}
+
+.modal__edit,
+.modal__delete {
+  flex: 1;
   padding: 10px;
-  background-color: transparent;
-  color: #c0392b;
-  border: 1px solid #c0392b;
   border-radius: 6px;
   font-size: 0.9rem;
   cursor: pointer;
   transition:
     background-color 0.2s ease,
     color 0.2s ease;
+}
+
+.modal__edit {
+  background-color: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-text);
+}
+
+.modal__edit:hover {
+  background-color: var(--color-text);
+  color: var(--color-card);
+}
+
+.modal__delete {
+  background-color: transparent;
+  color: #c0392b;
+  border: 1px solid #c0392b;
 }
 
 .modal__delete:hover {
