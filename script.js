@@ -213,9 +213,13 @@ async function handleFormSubmit(event) {
     .map((s) => s.trim())
     .filter((s) => s);
 
+  const isEdit = currentRecipeId !== null;
+  const url = isEdit ? `/api/recipes/${currentRecipeId}` : '/api/recipes';
+  const method = isEdit ? 'PUT' : 'POST';
+
   try {
-    const response = await fetch('/api/recipes', {
-      method: 'POST',
+    const response = await fetch(url, {
+      method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
@@ -224,17 +228,27 @@ async function handleFormSubmit(event) {
       throw new Error(`HTTP error: ${response.status}`);
     }
 
-    const newRecipe = await response.json();
+    const savedRecipe = await response.json();
 
-    allRecipes.push(newRecipe);
+    if (isEdit) {
+      const index = allRecipes.findIndex((r) => r.id === currentRecipeId);
+      if (index !== -1) {
+        allRecipes[index] = savedRecipe;
+      }
+    } else {
+      allRecipes.push(savedRecipe);
+    }
 
     renderRecipes(allRecipes);
 
     formModal.close();
     recipeForm.reset();
+    formTitle.textContent = 'Add New Recipe';
+    formSubmit.textContent = 'Add Recipe';
+    currentRecipeId = null;
   } catch (error) {
-    console.error('Failed to add recipe:', error);
-    alert('Failed to add recipe. Please try again.');
+    console.error('Failed to save recipe:', error);
+    alert('Failed to save recipe. Please try again.');
   }
 }
 
