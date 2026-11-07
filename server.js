@@ -13,6 +13,45 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon',
 };
 
+function validateRecipe(data) {
+  const errors = [];
+
+  if (!data.title || typeof data.title !== 'string' || !data.title.trim()) {
+    errors.push('title is required');
+  }
+
+  const validCategories = ['breakfast', 'lunch', 'dinner', 'dessert'];
+  if (!data.category || !validCategories.includes(data.category)) {
+    errors.push('category must be one of: ' + validCategories.join(', '));
+  }
+
+  if (!data.image || typeof data.image !== 'string' || !data.image.trim()) {
+    errors.push('image is required');
+  }
+
+  if (
+    !data.description ||
+    typeof data.description !== 'string' ||
+    !data.description.trim()
+  ) {
+    errors.push('description is required');
+  }
+
+  if (!Array.isArray(data.ingredients) || data.ingredients.length === 0) {
+    errors.push('ingredients must be a non-empty array');
+  }
+
+  if (
+    !data.instructions ||
+    typeof data.instructions !== 'string' ||
+    !data.instructions.trim()
+  ) {
+    errors.push('instructions is required');
+  }
+
+  return errors;
+}
+
 const server = http.createServer((req, res) => {
   if (req.url === '/api/recipes' && req.method === 'GET') {
     const recipesPath = path.join(__dirname, 'recipes.json');
@@ -41,6 +80,14 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       try {
         const newRecipe = JSON.parse(body);
+
+        const errors = validateRecipe(newRecipe);
+        if (errors.length > 0) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Invalid recipe', details: errors }));
+          return;
+        }
+
         const recipesPath = path.join(__dirname, 'recipes.json');
 
         fs.readFile(recipesPath, 'utf-8', (err, data) => {
@@ -137,6 +184,14 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       try {
         const updatedData = JSON.parse(body);
+
+        const errors = validateRecipe(updatedData);
+        if (errors.length > 0) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Invalid recipe', details: errors }));
+          return;
+        }
+
         const recipesPath = path.join(__dirname, 'recipes.json');
 
         fs.readFile(recipesPath, 'utf-8', (err, data) => {
