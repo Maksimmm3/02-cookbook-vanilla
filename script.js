@@ -22,6 +22,7 @@ const modalDelete = document.querySelector('.modal__delete');
 const modalEdit = document.querySelector('.modal__edit');
 const formTitle = document.querySelector('.form__title');
 const formSubmit = document.querySelector('.form__submit');
+const formErrors = document.querySelector('.form__errors');
 
 function createRecipeCard(recipe) {
   return `
@@ -107,6 +108,27 @@ function openEditForm() {
   setTimeout(() => {
     formModal.showModal();
   }, 300);
+}
+
+function showFormErrors(errors) {
+  if (!errors || errors.length === 0) {
+    formErrors.hidden = true;
+    formErrors.innerHTML = '';
+    return;
+  }
+
+  formErrors.innerHTML = `
+    <strong>Please fix the following:</strong>
+    <ul>
+      ${errors.map((err) => `<li>${err}</li>`).join('')}
+    </ul>
+  `;
+  formErrors.hidden = false;
+}
+
+function clearFormErrors() {
+  formErrors.hidden = true;
+  formErrors.innerHTML = '';
 }
 
 function closeModal() {
@@ -205,6 +227,8 @@ async function loadRecipes() {
 async function handleFormSubmit(event) {
   event.preventDefault();
 
+  clearFormErrors();
+
   const formData = new FormData(recipeForm);
   const data = Object.fromEntries(formData);
 
@@ -225,7 +249,14 @@ async function handleFormSubmit(event) {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error: ${response.status}`);
+      const errorData = await response.json();
+
+      if (errorData.details && Array.isArray(errorData.details)) {
+        showFormErrors(errorData.details);
+      } else {
+        showFormErrors([errorData.error || 'Something went wrong']);
+      }
+      return;
     }
 
     const savedRecipe = await response.json();
@@ -248,7 +279,7 @@ async function handleFormSubmit(event) {
     currentRecipeId = null;
   } catch (error) {
     console.error('Failed to save recipe:', error);
-    alert('Failed to save recipe. Please try again.');
+    showFormErrors(['Network error. Please check your connection.']);
   }
 }
 
