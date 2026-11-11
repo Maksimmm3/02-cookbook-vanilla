@@ -45,6 +45,29 @@ body {
   }
 }
 
+/* ---------- Search ---------- */
+
+.search {
+  max-width: 400px;
+  margin: 0 auto 20px;
+  padding: 0 20px;
+}
+
+.search__input {
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.search__input:focus {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
+
 /* ---------- Filters ---------- */
 
 .filters {

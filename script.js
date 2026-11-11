@@ -1,4 +1,5 @@
 let allRecipes = [];
+let currentSearch = '';
 let currentRecipeId = null;
 
 const filtersContainer = document.querySelector('.filters');
@@ -23,6 +24,7 @@ const modalEdit = document.querySelector('.modal__edit');
 const formTitle = document.querySelector('.form__title');
 const formSubmit = document.querySelector('.form__submit');
 const formErrors = document.querySelector('.form__errors');
+const searchInput = document.querySelector('.search__input');
 
 function createRecipeCard(recipe) {
   return `
@@ -161,7 +163,7 @@ function handleFilterClick(event) {
   try {
     localStorage.setItem('recipeFilter', category);
   } catch (e) {
-    // localStorage unavailable (private mode) — ignore
+    // localStorage unavailable — ignore
   }
 
   document.querySelectorAll('.filters__btn').forEach((b) => {
@@ -172,12 +174,7 @@ function handleFilterClick(event) {
   btn.classList.add('filters__btn--active');
   btn.setAttribute('aria-pressed', 'true');
 
-  const filtered =
-    category === 'all'
-      ? allRecipes
-      : allRecipes.filter((r) => r.category === category);
-
-  renderRecipes(filtered);
+  applyFilters();
 }
 
 function initFilters(recipes) {
@@ -203,8 +200,36 @@ function initFilters(recipes) {
   btn.classList.add('filters__btn--active');
   btn.setAttribute('aria-pressed', 'true');
 
-  const filtered =
-    saved === 'all' ? recipes : recipes.filter((r) => r.category === saved);
+  applyFilters();
+}
+
+function debounce(fn, delay) {
+  let timeoutId;
+  return function (...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn(...args), delay);
+  };
+}
+
+function applyFilters() {
+  let filtered = allRecipes;
+
+  const activeBtn = document.querySelector('.filters__btn--active');
+  const category = activeBtn ? activeBtn.dataset.category : 'all';
+
+  if (category !== 'all') {
+    filtered = filtered.filter((r) => r.category === category);
+  }
+
+  if (currentSearch) {
+    const query = currentSearch.toLowerCase();
+    filtered = filtered.filter(
+      (r) =>
+        r.title.toLowerCase().includes(query) ||
+        r.description.toLowerCase().includes(query),
+    );
+  }
+
   renderRecipes(filtered);
 }
 
@@ -322,6 +347,13 @@ async function init() {
   allRecipes = data;
   initFilters(allRecipes);
 }
+
+const handleSearch = debounce((event) => {
+  currentSearch = event.target.value.trim();
+  applyFilters();
+}, 300);
+
+searchInput.addEventListener('input', handleSearch);
 
 filtersContainer.addEventListener('click', handleFilterClick);
 
