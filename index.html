@@ -24,6 +24,17 @@
         />
       </div>
 
+      <div class="sort">
+        <label class="sort__label" for="sortSelect">Sort by:</label>
+        <select class="sort__select" id="sortSelect">
+          <option value="default">Default</option>
+          <option value="title-asc">Title (A→Z)</option>
+          <option value="title-desc">Title (Z→A)</option>
+          <option value="id-desc">Newest first</option>
+          <option value="id-asc">Oldest first</option>
+        </select>
+      </div>
+
       <div class="filters" role="group" aria-label="Filter recipes by category">
         <button
           class="filters__btn filters__btn--active"
