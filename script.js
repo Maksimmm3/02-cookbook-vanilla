@@ -1,5 +1,6 @@
 let allRecipes = [];
 let currentSearch = '';
+let currentSort = 'default';
 let currentRecipeId = null;
 
 const filtersContainer = document.querySelector('.filters');
@@ -25,6 +26,7 @@ const formTitle = document.querySelector('.form__title');
 const formSubmit = document.querySelector('.form__submit');
 const formErrors = document.querySelector('.form__errors');
 const searchInput = document.querySelector('.search__input');
+const sortSelect = document.querySelector('#sortSelect');
 
 function createRecipeCard(recipe) {
   return `
@@ -211,6 +213,30 @@ function debounce(fn, delay) {
   };
 }
 
+function sortRecipes(recipes) {
+  const sorted = [...recipes];
+
+  switch (currentSort) {
+    case 'title-asc':
+      sorted.sort((a, b) => a.title.localeCompare(b.title));
+      break;
+    case 'title-desc':
+      sorted.sort((a, b) => b.title.localeCompare(a.title));
+      break;
+    case 'id-desc':
+      sorted.sort((a, b) => b.id - a.id);
+      break;
+    case 'id-asc':
+      sorted.sort((a, b) => a.id - b.id);
+      break;
+    default:
+      // 'default' — no sorting
+      break;
+  }
+
+  return sorted;
+}
+
 function applyFilters() {
   let filtered = allRecipes;
 
@@ -229,6 +255,8 @@ function applyFilters() {
         r.description.toLowerCase().includes(query),
     );
   }
+
+  filtered = sortRecipes(filtered);
 
   renderRecipes(filtered);
 }
@@ -354,6 +382,11 @@ const handleSearch = debounce((event) => {
 }, 300);
 
 searchInput.addEventListener('input', handleSearch);
+
+sortSelect.addEventListener('change', (event) => {
+  currentSort = event.target.value;
+  applyFilters();
+});
 
 filtersContainer.addEventListener('click', handleFilterClick);
 
