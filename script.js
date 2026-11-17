@@ -27,6 +27,7 @@ const formSubmit = document.querySelector('.form__submit');
 const formErrors = document.querySelector('.form__errors');
 const searchInput = document.querySelector('.search__input');
 const sortSelect = document.querySelector('#sortSelect');
+const themeToggle = document.querySelector('.theme-toggle');
 
 function createRecipeCard(recipe) {
   return `
@@ -213,6 +214,35 @@ function debounce(fn, delay) {
   };
 }
 
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+
+  try {
+    localStorage.setItem('recipeTheme', theme);
+  } catch (e) {
+    // localStorage unavailable — ignore
+  }
+}
+
+function initTheme() {
+  let saved = 'light';
+
+  try {
+    saved = localStorage.getItem('recipeTheme') || 'light';
+  } catch (e) {
+    // localStorage unavailable — fallback to 'light'
+  }
+
+  if (!saved) {
+    saved = window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
+  }
+
+  applyTheme(saved);
+}
+
 function sortRecipes(recipes) {
   const sorted = [...recipes];
 
@@ -365,6 +395,8 @@ async function handleDelete() {
 }
 
 async function init() {
+  initTheme();
+
   const data = await loadRecipes();
 
   if (!data) {
@@ -380,6 +412,12 @@ const handleSearch = debounce((event) => {
   currentSearch = event.target.value.trim();
   applyFilters();
 }, 300);
+
+themeToggle.addEventListener('click', () => {
+  const current = document.documentElement.dataset.theme;
+  const next = current === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+});
 
 searchInput.addEventListener('input', handleSearch);
 
