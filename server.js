@@ -1,6 +1,8 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { DatabaseSync } = require('node:sqlite');
+const db = new DatabaseSync(path.join(__dirname, 'recipes.db'));
 
 const MIME_TYPES = {
   '.html': 'text/html',
@@ -12,6 +14,18 @@ const MIME_TYPES = {
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
 };
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS recipes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    category TEXT NOT NULL,
+    image TEXT,
+    description TEXT,
+    ingredients TEXT,
+    instructions TEXT
+  )
+`);
 
 function validateRecipe(data) {
   const errors = [];
