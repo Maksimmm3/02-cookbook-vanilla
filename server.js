@@ -68,19 +68,21 @@ function validateRecipe(data) {
 
 const server = http.createServer((req, res) => {
   if (req.url === '/api/recipes' && req.method === 'GET') {
-    const recipesPath = path.join(__dirname, 'recipes.json');
+    try {
+      const rows = db.prepare('SELECT * FROM recipes').all();
 
-    fs.readFile(recipesPath, 'utf-8', (err, data) => {
-      if (err) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Failed to load recipes' }));
-        return;
-      }
+      const recipes = rows.map((row) => ({
+        ...row,
+        ingredients: JSON.parse(row.ingredients),
+      }));
 
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(data);
-    });
-
+      res.end(JSON.stringify(recipes));
+    } catch (error) {
+      console.error('Failed to fetch recipes:', error);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Failed to load recipes' }));
+    }
     return;
   }
 
