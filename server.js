@@ -104,36 +104,31 @@ const server = http.createServer((req, res) => {
           return;
         }
 
-        const recipesPath = path.join(__dirname, 'recipes.json');
+        const stmt = db.prepare(`
+        INSERT INTO recipes (title, category, image, description, ingredients, instructions)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `);
 
-        fs.readFile(recipesPath, 'utf-8', (err, data) => {
-          if (err) {
-            res.writeHead(500, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Failed to read recipes' }));
-            return;
-          }
+        const result = stmt.run(
+          newRecipe.title,
+          newRecipe.category,
+          newRecipe.image,
+          newRecipe.description,
+          JSON.stringify(newRecipe.ingredients),
+          newRecipe.instructions,
+        );
 
-          const recipes = JSON.parse(data);
-          const newId =
-            recipes.length > 0 ? Math.max(...recipes.map((r) => r.id)) + 1 : 1;
+        const savedRecipe = {
+          id: result.lastInsertRowid,
+          ...newRecipe,
+        };
 
-          const recipeToSave = { id: newId, ...newRecipe };
-          recipes.push(recipeToSave);
-
-          fs.writeFile(recipesPath, JSON.stringify(recipes, null, 2), (err) => {
-            if (err) {
-              res.writeHead(500, { 'Content-Type': 'application/json' });
-              res.end(JSON.stringify({ error: 'Failed to save recipe' }));
-              return;
-            }
-
-            res.writeHead(201, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify(recipeToSave));
-          });
-        });
+        res.writeHead(201, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(savedRecipe));
       } catch (error) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Invalid JSON' }));
+        console.error('Failed to save recipe:', error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Failed to save recipe' }));
       }
     });
 
