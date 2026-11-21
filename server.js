@@ -203,40 +203,40 @@ const server = http.createServer((req, res) => {
           return;
         }
 
-        const recipesPath = path.join(__dirname, 'recipes.json');
+        const stmt = db.prepare(`
+        UPDATE recipes
+        SET title = ?, category = ?, image = ?, description = ?, ingredients = ?, instructions = ?
+        WHERE id = ?
+      `);
 
-        fs.readFile(recipesPath, 'utf-8', (err, data) => {
-          if (err) {
-            res.writeHead(500, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Failed to read recipes' }));
-            return;
-          }
+        const result = stmt.run(
+          updatedData.title,
+          updatedData.category,
+          updatedData.image,
+          updatedData.description,
+          JSON.stringify(updatedData.ingredients),
+          updatedData.instructions,
+          id,
+        );
 
-          const recipes = JSON.parse(data);
-          const index = recipes.findIndex((r) => r.id === id);
+        if (result.changes === 0) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Recipe not found' }));
+          return;
+        }
 
-          if (index === -1) {
-            res.writeHead(404, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Recipe not found' }));
-            return;
-          }
+        const row = db.prepare('SELECT * FROM recipes WHERE id = ?').get(id);
+        const savedRecipe = {
+          ...row,
+          ingredients: JSON.parse(row.ingredients),
+        };
 
-          recipes[index] = { ...recipes[index], ...updatedData, id };
-
-          fs.writeFile(recipesPath, JSON.stringify(recipes, null, 2), (err) => {
-            if (err) {
-              res.writeHead(500, { 'Content-Type': 'application/json' });
-              res.end(JSON.stringify({ error: 'Failed to update recipe' }));
-              return;
-            }
-
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify(recipes[index]));
-          });
-        });
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(savedRecipe));
       } catch (error) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Invalid JSON' }));
+        console.error('Failed to update recipe:', error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Failed to update recipe' }));
       }
     });
 
