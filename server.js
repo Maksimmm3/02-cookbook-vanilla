@@ -144,35 +144,23 @@ const server = http.createServer((req, res) => {
       return;
     }
 
-    const recipesPath = path.join(__dirname, 'recipes.json');
+    try {
+      const stmt = db.prepare('DELETE FROM recipes WHERE id = ?');
+      const result = stmt.run(id);
 
-    fs.readFile(recipesPath, 'utf-8', (err, data) => {
-      if (err) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Failed to read recipes' }));
-        return;
-      }
-
-      const recipes = JSON.parse(data);
-      const filtered = recipes.filter((r) => r.id !== id);
-
-      if (filtered.length === recipes.length) {
+      if (result.changes === 0) {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Recipe not found' }));
         return;
       }
 
-      fs.writeFile(recipesPath, JSON.stringify(filtered, null, 2), (err) => {
-        if (err) {
-          res.writeHead(500, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Failed to delete recipe' }));
-          return;
-        }
-
-        res.writeHead(204);
-        res.end();
-      });
-    });
+      res.writeHead(204);
+      res.end();
+    } catch (error) {
+      console.error('Failed to delete recipe:', error);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Failed to delete recipe' }));
+    }
 
     return;
   }
