@@ -4,7 +4,7 @@ A fullstack recipe library built with **pure HTML, CSS, JavaScript, and Node.js*
 
 ## 🎯 Purpose
 
-This project was built to **strengthen core web development skills** without relying on frameworks. The goal was to understand what happens "under the hood" — from DOM manipulation on the frontend to HTTP servers and file I/O on the backend.
+This project was built to **strengthen core web development skills** without relying on frameworks. The goal was to understand what happens "under the hood" — from DOM manipulation on the frontend to HTTP servers and SQL databases on the backend.
 
 ## 🛠️ Tech Stack
 
@@ -17,7 +17,7 @@ This project was built to **strengthen core web development skills** without rel
 ### Backend
 
 - **Node.js** — pure `http` module, no Express
-- **File system** — `fs` for reading/writing JSON
+- **SQLite** — built-in `node:sqlite` module (no dependencies)
 - **REST API** — GET, POST, PUT, DELETE
 
 ## ✨ Features
@@ -51,12 +51,13 @@ This project was built to **strengthen core web development skills** without rel
 
 ```text
 02-cookbook-vanilla/
-├── index.html    # Main page
-├── style.css     # All styles (organized by sections)
-├── script.js     # Frontend logic
-├── server.js     # Node.js server (static + API)
-├── recipes.json  # Data storage (acts as database)
-└── README.md     # Project documentation
+├── index.html          # Main page
+├── style.css           # All styles (organized by sections)
+├── script.js           # Frontend logic
+├── server.js           # Node.js server (static + API)
+├── seed.js             # Script to populate database with sample recipes
+├── recipes.db          # SQLite database (created on first run, ignored by git)
+└── README.md
 ```
 
 ## 🚀 How to Run
@@ -65,7 +66,7 @@ This project was built to **strengthen core web development skills** without rel
 
 - Node.js (v18+)
 
-## Steps
+### Steps
 
 1. **Clone the repository:**
 
@@ -74,12 +75,27 @@ This project was built to **strengthen core web development skills** without rel
    cd 02-cookbook-vanilla
    ```
 
-2. **Start the server:**
+2. **Start the server (creates `recipes.db` on first run):**
 
    ```bash
    node server.js
    ```
 
-3. **Open in browser:**
+3. **In a new terminal, populate the database with sample recipes:**
+
+   ```bash
+   node seed.js
+   ```
+
+4. **Open in browser:**
 
    http://localhost:3000
+
+## 🔌 API Endpoints
+
+| Method   | Endpoint           | Description         |
+| -------- | ------------------ | ------------------- |
+| `GET`    | `/api/recipes`     | Get all recipes     |
+| `POST`   | `/api/recipes`     | Create a new recipe |
+| `PUT`    | `/api/recipes/:id` | Update a recipe     |
+| `DELETE` | `/api/recipes/:id` | Delete a recipe     |
